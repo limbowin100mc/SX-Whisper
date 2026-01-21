@@ -18,6 +18,7 @@ import {
   IconWaveSine,
 } from '@tabler/icons-react';
 import { AppConfig, ACCENT_COLORS, OVERLAY_COLORS } from '../types';
+import '../styles/glass-effects.css';
 
 interface ThemesPanelProps {
   config: AppConfig;
@@ -74,59 +75,45 @@ export function ThemesPanel({ config, onConfigChange }: ThemesPanelProps) {
                 <UnstyledButton
                   key={option.value}
                   onClick={() => onConfigChange({ ...config, theme: option.value })}
-                  style={{ width: '100%' }}
+                  className={`glass-card ${isSelected ? 'glass-card-active' : ''}`}
+                  style={{ width: '100%', padding: '20px', borderRadius: '12px' }}
                 >
-                  <Paper
-                    p="lg"
-                    radius="lg"
-                    style={{
-                      border: isSelected 
-                        ? '2px solid #22c55e' 
-                        : '1px solid #333',
-                      background: isSelected 
-                        ? 'rgba(34, 197, 94, 0.1)' 
-                        : '#111',
-                      transition: 'all 0.2s ease',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Stack align="center" gap="sm">
-                      <Box
+                  <Stack align="center" gap="sm">
+                    <Box
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 14,
+                        background: isSelected 
+                          ? `linear-gradient(135deg, var(--mantine-color-${currentAccent.gradient.from}-filled), var(--mantine-color-${currentAccent.gradient.to}-filled))`
+                          : '#1a1a1a',
+                        border: isSelected ? 'none' : '1px solid #333',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Icon size={24} color={isSelected ? 'white' : '#666'} />
+                    </Box>
+                    <div style={{ textAlign: 'center' }}>
+                      <Text fw={600} size="sm" style={{ color: '#fff' }}>{option.label}</Text>
+                      <Text size="xs" c="dimmed">{option.description}</Text>
+                    </div>
+                    {isSelected && (
+                      <Badge 
+                        size="sm" 
+                        radius="xl"
+                        leftSection={<IconCheck size={10} />}
                         style={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 14,
-                          background: isSelected 
-                            ? `linear-gradient(135deg, var(--mantine-color-${currentAccent.gradient.from}-filled), var(--mantine-color-${currentAccent.gradient.to}-filled))`
-                            : '#1a1a1a',
-                          border: isSelected ? 'none' : '1px solid #333',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          background: 'rgba(34, 197, 94, 0.15)',
+                          border: '1px solid rgba(34, 197, 94, 0.3)',
+                          color: '#22c55e',
                         }}
                       >
-                        <Icon size={24} color={isSelected ? 'white' : '#666'} />
-                      </Box>
-                      <div style={{ textAlign: 'center' }}>
-                        <Text fw={600} size="sm" style={{ color: '#fff' }}>{option.label}</Text>
-                        <Text size="xs" c="dimmed">{option.description}</Text>
-                      </div>
-                      {isSelected && (
-                        <Badge 
-                          size="sm" 
-                          radius="xl"
-                          leftSection={<IconCheck size={10} />}
-                          style={{
-                            background: 'rgba(34, 197, 94, 0.15)',
-                            border: '1px solid rgba(34, 197, 94, 0.3)',
-                            color: '#22c55e',
-                          }}
-                        >
-                          Active
-                        </Badge>
-                      )}
-                    </Stack>
-                  </Paper>
+                        Active
+                      </Badge>
+                    )}
+                  </Stack>
                 </UnstyledButton>
               );
             })}
@@ -172,37 +159,25 @@ export function ThemesPanel({ config, onConfigChange }: ThemesPanelProps) {
                 <UnstyledButton
                   key={color.value}
                   onClick={() => onConfigChange({ ...config, accentColor: color.value })}
-                  style={{ width: '100%' }}
+                  className={`glass-button ${isSelected ? 'glass-button-active' : ''}`}
+                  style={{ width: '100%', padding: '12px', borderRadius: '12px' }}
                 >
-                  <Paper
-                    p="md"
-                    radius="lg"
-                    style={{
-                      border: isSelected 
-                        ? `2px solid var(--mantine-color-${color.value}-filled)` 
-                        : '1px solid #333',
-                      background: '#111',
-                      transition: 'all 0.2s ease',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Group gap="sm" justify="center">
-                      <Box
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: '50%',
-                          background: `linear-gradient(135deg, var(--mantine-color-${color.gradient.from}-filled), var(--mantine-color-${color.gradient.to}-filled))`,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {isSelected && <IconCheck size={16} color="white" />}
-                      </Box>
-                      <Text fw={500} size="sm" style={{ color: '#fff' }}>{color.label}</Text>
-                    </Group>
-                  </Paper>
+                  <Group gap="sm" justify="center">
+                    <Box
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '50%',
+                        background: `linear-gradient(135deg, var(--mantine-color-${color.gradient.from}-filled), var(--mantine-color-${color.gradient.to}-filled))`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {isSelected && <IconCheck size={16} color="white" />}
+                    </Box>
+                    <Text fw={500} size="sm" style={{ color: '#fff' }}>{color.label}</Text>
+                  </Group>
                 </UnstyledButton>
               );
             })}
@@ -248,37 +223,25 @@ export function ThemesPanel({ config, onConfigChange }: ThemesPanelProps) {
                 <UnstyledButton
                   key={color.value}
                   onClick={() => onConfigChange({ ...config, overlayColor: color.value })}
-                  style={{ width: '100%' }}
+                  className={`glass-button ${isSelected ? 'glass-button-active' : ''}`}
+                  style={{ width: '100%', padding: '12px', borderRadius: '12px' }}
                 >
-                  <Paper
-                    p="md"
-                    radius="lg"
-                    style={{
-                      border: isSelected 
-                        ? `2px solid ${color.color}` 
-                        : '1px solid #333',
-                      background: '#111',
-                      transition: 'all 0.2s ease',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Group gap="sm" justify="center">
-                      <Box
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: '50%',
-                          background: color.gradient,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                        }}
-                      >
-                        {isSelected && <IconCheck size={16} color={color.value === 'white' ? '#333' : 'white'} />}
-                      </Box>
-                      <Text fw={500} size="sm" style={{ color: '#fff' }}>{color.label}</Text>
-                    </Group>
-                  </Paper>
+                  <Group gap="sm" justify="center">
+                    <Box
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: '50%',
+                        background: color.gradient,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {isSelected && <IconCheck size={16} color={color.value === 'white' ? '#333' : 'white'} />}
+                    </Box>
+                    <Text fw={500} size="sm" style={{ color: '#fff' }}>{color.label}</Text>
+                  </Group>
                 </UnstyledButton>
               );
             })}

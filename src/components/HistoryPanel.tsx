@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { save } from '@tauri-apps/plugin-dialog';
 import { writeTextFile } from '@tauri-apps/plugin-fs';
 import { notifications } from '@mantine/notifications';
+import '../styles/glass-effects.css';
 
 interface HistoryPanelProps {
   entries: HistoryEntry[];
@@ -175,10 +176,7 @@ export function HistoryPanel({ entries, onCopy, onClear, config }: HistoryPanelP
               leftSection={<IconDownload size={16} />}
               onClick={handleDownload}
               radius="lg"
-              style={{
-                background: 'rgba(34, 197, 94, 0.15)',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-              }}
+              className="glass-button-primary"
             >
               Download
             </Button>
@@ -189,6 +187,7 @@ export function HistoryPanel({ entries, onCopy, onClear, config }: HistoryPanelP
               leftSection={<IconTrash size={16} />}
               onClick={onClear}
               radius="lg"
+              className="glass-button-danger"
             >
               Clear All
             </Button>

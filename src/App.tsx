@@ -31,9 +31,11 @@ import { SettingsPanel } from './components/SettingsPanel';
 import { HistoryPanel } from './components/HistoryPanel';
 import { ThemesPanel } from './components/ThemesPanel';
 import { AboutPanel } from './components/AboutPanel';
+import { IntroScreen } from './components/IntroScreen';
 import { useConfig } from './hooks/useConfig';
 import { useRecording } from './hooks/useRecording';
 import { useHistory } from './hooks/useHistory';
+import './styles/glass-effects.css';
 
 interface NavLinkProps {
   icon: typeof IconSettings;
@@ -45,28 +47,22 @@ interface NavLinkProps {
   collapsed?: boolean;
 }
 
-function NavLink({ icon: Icon, label, active, onClick, color, count, collapsed }: NavLinkProps) {
+function NavLink({ icon: Icon, label, active, onClick, count, collapsed }: NavLinkProps) {
   return (
     <Tooltip label={label} position="right" disabled={!collapsed} withArrow>
       <UnstyledButton
         onClick={onClick}
+        className={`glass-button ${active ? 'glass-button-active' : ''} glass-stagger-${Math.min(count || 1, 10)}`}
         style={{
           width: '100%',
           padding: '12px',
           paddingLeft: collapsed ? '12px' : '16px',
           borderRadius: '10px',
           color: active ? 'white' : 'var(--mantine-color-dimmed)',
-          backgroundColor: active ? `var(--mantine-color-${color}-filled)` : 'transparent',
-          transition: 'all 0.25s ease',
           display: 'flex',
           justifyContent: 'flex-start',
           alignItems: 'center',
-        }}
-        onMouseEnter={(e) => {
-          if (!active) e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
-        }}
-        onMouseLeave={(e) => {
-          if (!active) e.currentTarget.style.backgroundColor = 'transparent';
+          marginBottom: '4px',
         }}
       >
         <Group gap="sm" wrap="nowrap" style={{ width: '100%' }}>
@@ -131,6 +127,11 @@ function App() {
   const isCapturingHotkeyRef = useRef(false);
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [collapsed, setCollapsed] = useState(false);
+  const [showIntro, setShowIntro] = useState(true); // Always show intro on app start
+
+  const handleGetStarted = () => {
+    setShowIntro(false);
+  };
 
   useEffect(() => {
     setColorScheme(config.theme);
@@ -161,6 +162,11 @@ function App() {
     { value: 'themes', label: 'Themes', icon: IconPalette },
     { value: 'about', label: 'About', icon: IconInfoCircle },
   ];
+
+  // Show intro screen on first launch
+  if (showIntro) {
+    return <IntroScreen onGetStarted={handleGetStarted} />;
+  }
 
   return (
     <Box

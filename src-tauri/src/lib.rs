@@ -147,6 +147,7 @@ fn show_overlay(app: &tauri::AppHandle) {
         .resizable(false)
         .shadow(false)
         .visible(false)
+        .focused(false)
         .build();
 
     if let Ok(overlay) = overlay {

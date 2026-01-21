@@ -38,6 +38,7 @@ import {
 } from '@tabler/icons-react';
 import { HotkeyInput } from './HotkeyInput';
 import { AppConfig, SUPPORTED_LANGUAGES, LANGUAGE_GROUPS, TEXT_FORMATS, WordReplacement } from '../types';
+import '../styles/glass-effects.css';
 
 interface SettingsPanelProps {
   config: AppConfig;
@@ -238,29 +239,22 @@ export function SettingsPanel({ config, onConfigChange, onHotkeyCapture }: Setti
           <div>
             <Text size="xs" fw={600} c="dimmed" mb="sm">Popular Languages</Text>
             <SimpleGrid cols={5} spacing="xs">
-              {popularLanguages.slice(0, 10).map((lang) => (
+              {popularLanguages.slice(0, 10).map((lang, index) => (
                 <UnstyledButton
                   key={lang.code}
                   onClick={() => selectLanguage(lang.code)}
+                  className={`glass-button ${config.language === lang.code ? 'glass-button-active' : ''} glass-stagger-${index + 1}`}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                  }}
                 >
-                  <Paper
-                    p="sm"
-                    radius="md"
-                    style={{
-                      background: config.language === lang.code ? 'rgba(34, 197, 94, 0.15)' : '#111',
-                      border: config.language === lang.code 
-                        ? '2px solid #22c55e' 
-                        : '1px solid #333',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Text size="xl" mb={2}>{lang.flag}</Text>
-                    <Text size="xs" c={config.language === lang.code ? '#22c55e' : 'dimmed'} fw={500}>
-                      {lang.name.length > 8 ? lang.name.slice(0, 7) + '.' : lang.name}
-                    </Text>
-                  </Paper>
+                  <Text size="xl" mb={2}>{lang.flag}</Text>
+                  <Text size="xs" c={config.language === lang.code ? '#22c55e' : 'dimmed'} fw={500}>
+                    {lang.name.length > 8 ? lang.name.slice(0, 7) + '.' : lang.name}
+                  </Text>
                 </UnstyledButton>
               ))}
             </SimpleGrid>
@@ -273,6 +267,7 @@ export function SettingsPanel({ config, onConfigChange, onHotkeyCapture }: Setti
             onClick={() => setShowAllLanguages(!showAllLanguages)}
             fullWidth
             rightSection={showAllLanguages ? <IconChevronUp size={16} /> : <IconChevronDown size={16} />}
+            className="glass-button"
           >
             {showAllLanguages ? 'Hide all languages' : 'View all 57 languages'}
           </Button>
@@ -304,37 +299,25 @@ export function SettingsPanel({ config, onConfigChange, onHotkeyCapture }: Setti
                     <UnstyledButton
                       key={lang.code}
                       onClick={() => selectLanguage(lang.code)}
-                      style={{ width: '100%' }}
+                      className={`glass-button ${config.language === lang.code ? 'glass-button-active' : ''}`}
+                      style={{ width: '100%', padding: '12px', borderRadius: '8px' }}
                     >
-                      <Paper
-                        p="md"
-                        radius="md"
-                        style={{
-                          background: config.language === lang.code ? 'rgba(34, 197, 94, 0.15)' : '#111',
-                          border: config.language === lang.code 
-                            ? '2px solid #22c55e' 
-                            : '1px solid #333',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease',
-                        }}
-                      >
-                        <Group gap="sm" wrap="nowrap">
-                          <Text size="xl">{lang.flag}</Text>
-                          <Text 
-                            size="sm" 
-                            fw={500} 
-                            style={{ 
-                              color: config.language === lang.code ? '#22c55e' : '#fff',
-                              flex: 1,
-                            }}
-                          >
-                            {lang.name}
-                          </Text>
-                          {config.language === lang.code && (
-                            <IconCheck size={16} color="#22c55e" />
-                          )}
-                        </Group>
-                      </Paper>
+                      <Group gap="sm" wrap="nowrap">
+                        <Text size="xl">{lang.flag}</Text>
+                        <Text 
+                          size="sm" 
+                          fw={500} 
+                          style={{ 
+                            color: config.language === lang.code ? '#22c55e' : '#fff',
+                            flex: 1,
+                          }}
+                        >
+                          {lang.name}
+                        </Text>
+                        {config.language === lang.code && (
+                          <IconCheck size={16} color="#22c55e" />
+                        )}
+                      </Group>
                     </UnstyledButton>
                   ))}
                 </SimpleGrid>
@@ -497,9 +480,7 @@ export function SettingsPanel({ config, onConfigChange, onHotkeyCapture }: Setti
                 onClick={addReplacement}
                 disabled={!newTrigger.trim() || !newReplacement.trim()}
                 radius="lg"
-                style={{
-                  background: '#22c55e',
-                }}
+                className="glass-button-primary"
               >
                 Add
               </Button>

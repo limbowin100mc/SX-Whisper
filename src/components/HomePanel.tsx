@@ -9,6 +9,7 @@ import {
     Card,
     SimpleGrid,
     Box,
+    ThemeIcon,
 } from '@mantine/core';
 import {
     IconKeyboard,
@@ -18,12 +19,13 @@ import {
     IconBolt,
     IconShieldCheck,
     IconWifi,
-    IconCheck,
-    IconX,
     IconMicrophone,
+    IconPlayerPlay,
+    IconPlayerPause,
 } from '@tabler/icons-react';
 import { AppConfig, SUPPORTED_LANGUAGES } from '../types';
 import { useStats } from '../hooks/useStats';
+import '../styles/glass-effects.css';
 
 interface HomePanelProps {
     config: AppConfig;
@@ -49,377 +51,246 @@ export function HomePanel({ config, onConfigChange, isRecording }: HomePanelProp
     };
 
     return (
-        <Stack gap="lg">
+        <Stack gap="xl">
             {/* Hero Status Card */}
             <Paper
-                p={30}
-                radius="lg"
+                p={0}
+                radius="xl"
                 style={{
                     position: 'relative',
                     overflow: 'hidden',
-                    background: '#151515',
-                    border: '1px solid #222',
+                    background: 'linear-gradient(145deg, #1a1a1a 0%, #0f0f0f 100%)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
                 }}
             >
-                {/* Background gradient orb */}
-                {config.isEnabled && (
-                    <Box
-                        style={{
-                            position: 'absolute',
-                            top: -100,
-                            right: -100,
-                            width: 300,
-                            height: 300,
-                            background: 'radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, transparent 70%)',
-                            filter: 'blur(40px)',
-                            pointerEvents: 'none',
-                        }}
-                    />
-                )}
-                
-                <Group justify="space-between" align="center" style={{ position: 'relative', zIndex: 1 }}>
-                    <Group gap="xl">
-                        <Box
-                            style={{
-                                width: 80,
-                                height: 80,
-                                borderRadius: 16,
-                                background: config.isEnabled 
-                                    ? 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)'
-                                    : '#222',
-                                border: '1px solid #333',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: config.isEnabled 
-                                    ? '0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' 
-                                    : undefined,
-                                transition: 'all 0.3s ease'
-                            }}
-                        >
-                            <IconMicrophone 
-                                size={40} 
-                                color={config.isEnabled ? "#ef4444" : "#666"} 
-                                style={{ 
-                                    filter: config.isEnabled ? 'drop-shadow(0 0 12px rgba(239, 68, 68, 0.6))' : undefined 
-                                }} 
+                {/* Status Indicator Bar */}
+                <Box
+                    style={{
+                        height: 4,
+                        width: '100%',
+                        background: config.isEnabled
+                            ? 'linear-gradient(90deg, #22c55e 0%, #16a34a 100%)'
+                            : '#333'
+                    }}
+                />
+
+                <Group justify="space-between" align="stretch" gap={0} wrap="nowrap">
+                    {/* Left Side: Status & toggle */}
+                    <Box p={30} style={{ flex: 1, position: 'relative' }}>
+                        {/* Background Ambient Glow */}
+                        {config.isEnabled && (
+                            <Box
+                                style={{
+                                    position: 'absolute',
+                                    top: -60,
+                                    left: -60,
+                                    width: 200,
+                                    height: 200,
+                                    background: 'radial-gradient(circle, rgba(34, 197, 94, 0.1) 0%, transparent 70%)',
+                                    filter: 'blur(40px)',
+                                    pointerEvents: 'none',
+                                }}
                             />
-                        </Box>
+                        )}
 
-                        <Stack gap={4}>
-                            <Title order={2} fw={700} style={{ color: '#fff' }}>
-                                {config.isEnabled ? (isRecording ? 'Listening...' : 'Ready to Whisper') : 'System Paused'}
-                            </Title>
-                            <Text c="dimmed" size="lg">
-                                {config.isEnabled
-                                    ? 'Use your hotkey to start transcribing'
-                                    : 'Enable Push-to-Talk to start'}
-                            </Text>
-
-                            {config.isEnabled && (
-                                <Group gap={8} mt={8}>
-                                    <Badge 
-                                        variant="light" 
-                                        color={config.accentColor} 
-                                        size="lg"
-                                        radius="xl"
+                        <Stack gap="lg" style={{ position: 'relative', zIndex: 1 }}>
+                            <Group align="flex-start" justify="space-between">
+                                <Group gap="lg">
+                                    <ThemeIcon
+                                        size={56}
+                                        radius="md"
+                                        variant="gradient"
+                                        gradient={config.isEnabled
+                                            ? { from: '#1c1c1c', to: '#111', deg: 145 }
+                                            : { from: '#222', to: '#222', deg: 0 }
+                                        }
                                         style={{
-                                            background: 'rgba(34, 197, 94, 0.15)',
-                                            border: '1px solid rgba(34, 197, 94, 0.3)',
+                                            border: '1px solid rgba(255,255,255,0.1)',
+                                            boxShadow: config.isEnabled ? '0 4px 20px rgba(0,0,0,0.3)' : 'none'
                                         }}
                                     >
-                                        <Group gap={6}>
-                                            <Box
-                                                style={{
-                                                    width: 6,
-                                                    height: 6,
-                                                    borderRadius: '50%',
-                                                    background: '#22c55e',
-                                                    animation: 'pulse 2s ease-in-out infinite',
-                                                }}
-                                            />
-                                            Running
-                                        </Group>
+                                        <IconMicrophone
+                                            size={28}
+                                            color={config.isEnabled ? "#ef4444" : "#666"}
+                                            style={{ filter: config.isEnabled ? 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.4))' : undefined }}
+                                        />
+                                    </ThemeIcon>
+                                    <div>
+                                        <Text size="lg" fw={700} c="white" mb={2}>
+                                            {config.isEnabled ? 'System Active' : 'System Paused'}
+                                        </Text>
+                                        <Text size="sm" c="dimmed">
+                                            {config.isEnabled ? 'Ready to transcribe audio' : 'Enable to start transcribing'}
+                                        </Text>
+                                    </div>
+                                </Group>
+
+                                <Switch
+                                    checked={config.isEnabled}
+                                    onChange={(e) => updateConfig('isEnabled', e.currentTarget.checked)}
+                                    size="lg"
+                                    color="green"
+                                    thumbIcon={
+                                        config.isEnabled ? (
+                                            <IconPlayerPlay size="0.8rem" color="#16a34a" stroke={3} />
+                                        ) : (
+                                            <IconPlayerPause size="0.8rem" color="#666" stroke={3} />
+                                        )
+                                    }
+                                />
+                            </Group>
+
+                            {config.isEnabled && (
+                                <Group gap="xs" mt={4}>
+                                    <Badge
+                                        size="lg"
+                                        variant="dot"
+                                        color={isRecording ? 'red' : 'green'}
+                                        radius="md"
+                                        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
+                                    >
+                                        {isRecording ? 'Recording...' : 'Standby'}
                                     </Badge>
-                                    <Badge 
-                                        variant="outline" 
-                                        color="gray" 
-                                        size="lg" 
-                                        radius="xl"
-                                        style={{ borderColor: '#333' }}
+                                    <Badge
+                                        size="lg"
+                                        variant="outline"
+                                        color="gray"
+                                        radius="md"
+                                        style={{ borderColor: 'rgba(255,255,255,0.1)' }}
                                     >
                                         {currentLanguage.flag} {currentLanguage.name}
                                     </Badge>
-                                    {config.hotkey && (
-                                        <Badge 
-                                            variant="outline" 
-                                            color="gray" 
-                                            size="lg" 
-                                            radius="xl"
-                                            leftSection={<IconKeyboard size={14} />}
-                                            style={{ borderColor: '#333' }}
-                                        >
-                                            {config.hotkey}
-                                        </Badge>
-                                    )}
+                                    <Badge
+                                        size="lg"
+                                        variant="outline"
+                                        color="gray"
+                                        radius="md"
+                                        leftSection={<IconKeyboard size={12} />}
+                                        style={{ borderColor: 'rgba(255,255,255,0.1)' }}
+                                    >
+                                        {config.hotkey || 'None'}
+                                    </Badge>
                                 </Group>
                             )}
                         </Stack>
-                    </Group>
-
-                    <Switch
-                        checked={config.isEnabled}
-                        onChange={(e) => updateConfig('isEnabled', e.currentTarget.checked)}
-                        size="xl"
-                        color={config.accentColor}
-                        thumbIcon={
-                            config.isEnabled ? (
-                                <IconCheck size="0.8rem" color="#22c55e" stroke={3} />
-                            ) : (
-                                <IconX size="0.8rem" color="#666" stroke={3} />
-                            )
-                        }
-                    />
+                    </Box>
                 </Group>
             </Paper>
 
-            {/* Stats Grid */}
-            <Stack gap="md">
-                <Text size="sm" fw={600} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-                    Your Activity
-                </Text>
-                <SimpleGrid cols={3} spacing="md">
-                    <Card 
-                        radius="lg" 
-                        padding="xl" 
-                        style={{ 
-                            textAlign: 'center',
-                            background: '#151515',
-                            border: '1px solid #222',
-                            transition: 'all 0.25s ease',
-                        }}
-                        className="sx-card-hover"
-                    >
-                        <Stack align="center" gap="xs">
-                            <Box
-                                style={{
-                                    width: 44,
-                                    height: 44,
-                                    borderRadius: 12,
-                                    background: 'linear-gradient(135deg, #111 0%, #151515 100%)',
-                                    border: '1px solid #222',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <IconFileText size={20} color="#22c55e" />
-                            </Box>
-                            <Text size="2.5rem" fw={700} lh={1} style={{ color: '#fff' }}>
-                                {stats.wordsTranscribed}
-                            </Text>
-                            <Text size="sm" c="dimmed" fw={500}>Words Transcribed</Text>
-                        </Stack>
-                    </Card>
-
-                    <Card 
-                        radius="lg" 
-                        padding="xl" 
-                        style={{ 
-                            textAlign: 'center',
-                            background: '#151515',
-                            border: '1px solid #222',
-                            transition: 'all 0.25s ease',
-                        }}
-                        className="sx-card-hover"
-                    >
-                        <Stack align="center" gap="xs">
-                            <Box
-                                style={{
-                                    width: 44,
-                                    height: 44,
-                                    borderRadius: 12,
-                                    background: 'linear-gradient(135deg, #111 0%, #151515 100%)',
-                                    border: '1px solid #222',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <IconClock size={20} color="#22c55e" />
-                            </Box>
-                            <Text size="2.5rem" fw={700} lh={1} style={{ color: '#fff' }}>
-                                {formatDuration(stats.usageTimeSeconds)}
-                            </Text>
-                            <Text size="sm" c="dimmed" fw={500}>Usage Time</Text>
-                        </Stack>
-                    </Card>
-
-                    <Card 
-                        radius="lg" 
-                        padding="xl" 
-                        style={{ 
-                            textAlign: 'center',
-                            background: '#151515',
-                            border: '1px solid #222',
-                            transition: 'all 0.25s ease',
-                        }}
-                        className="sx-card-hover"
-                    >
-                        <Stack align="center" gap="xs">
-                            <Box
-                                style={{
-                                    width: 44,
-                                    height: 44,
-                                    borderRadius: 12,
-                                    background: 'linear-gradient(135deg, #111 0%, #151515 100%)',
-                                    border: '1px solid #222',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <IconStack2 size={20} color="#22c55e" />
-                            </Box>
-                            <Text size="2.5rem" fw={700} lh={1} style={{ color: '#fff' }}>
-                                {stats.sessionsCount}
-                            </Text>
-                            <Text size="sm" c="dimmed" fw={500}>Sessions</Text>
-                        </Stack>
-                    </Card>
-                </SimpleGrid>
-            </Stack>
-
-            {/* Features Grid */}
-            <Stack gap="md">
-                <Text size="sm" fw={600} c="dimmed" tt="uppercase" style={{ letterSpacing: '0.05em' }}>
-                    Features
-                </Text>
-                <SimpleGrid cols={3} spacing="md">
-                    <Card 
-                        radius="lg" 
-                        padding="lg" 
-                        style={{ 
-                            background: '#151515',
-                            border: '1px solid #222',
-                            transition: 'all 0.25s ease',
-                        }}
-                        className="sx-card-hover"
-                    >
-                        <Stack gap="sm">
-                            <Box
-                                style={{
-                                    width: 44,
-                                    height: 44,
-                                    borderRadius: 12,
-                                    background: 'linear-gradient(135deg, #111 0%, #151515 100%)',
-                                    border: '1px solid #222',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <IconBolt size={20} color="#22c55e" />
-                            </Box>
-                            <Text fw={600} size="sm" style={{ color: '#fff' }}>Lightning Fast</Text>
-                            <Text size="xs" c="dimmed">Sub-second latency powered by Groq</Text>
-                        </Stack>
-                    </Card>
-
-                    <Card 
-                        radius="lg" 
-                        padding="lg" 
-                        style={{ 
-                            background: '#151515',
-                            border: '1px solid #222',
-                            transition: 'all 0.25s ease',
-                        }}
-                        className="sx-card-hover"
-                    >
-                        <Stack gap="sm">
-                            <Box
-                                style={{
-                                    width: 44,
-                                    height: 44,
-                                    borderRadius: 12,
-                                    background: 'linear-gradient(135deg, #111 0%, #151515 100%)',
-                                    border: '1px solid #222',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <IconShieldCheck size={20} color="#22c55e" />
-                            </Box>
-                            <Text fw={600} size="sm" style={{ color: '#fff' }}>Privacy First</Text>
-                            <Text size="xs" c="dimmed">Your data stays on your machine</Text>
-                        </Stack>
-                    </Card>
-
-                    <Card 
-                        radius="lg" 
-                        padding="lg" 
-                        style={{ 
-                            background: '#151515',
-                            border: '1px solid #222',
-                            transition: 'all 0.25s ease',
-                        }}
-                        className="sx-card-hover"
-                    >
-                        <Stack gap="sm">
-                            <Box
-                                style={{
-                                    width: 44,
-                                    height: 44,
-                                    borderRadius: 12,
-                                    background: 'linear-gradient(135deg, #111 0%, #151515 100%)',
-                                    border: '1px solid #222',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
-                                <IconWifi size={20} color="#22c55e" />
-                            </Box>
-                            <Text fw={600} size="sm" style={{ color: '#fff' }}>99% Accuracy</Text>
-                            <Text size="xs" c="dimmed">Powered by Whisper AI</Text>
-                        </Stack>
-                    </Card>
-                </SimpleGrid>
-            </Stack>
-
-            {/* Quick Start Hint */}
-            <Card 
-                radius="lg" 
-                p="lg" 
-                style={{
-                    background: '#111',
-                    border: '1px solid #222',
-                }}
-            >
-                <Group>
-                    <Box
+            <SimpleGrid cols={3} spacing="lg">
+                <Stack gap="lg">
+                    <Title order={4} c="dimmed" size="sm" tt="uppercase" fw={700} style={{ letterSpacing: '0.05em' }}>Activity Stats</Title>
+                    <Card
+                        radius="lg"
+                        p="xl"
                         style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: 10,
-                            background: 'rgba(34, 197, 94, 0.15)',
-                            border: '1px solid rgba(34, 197, 94, 0.3)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            background: 'linear-gradient(180deg, #151515 0%, #0a0a0a 100%)',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                            height: '100%',
                         }}
                     >
-                        <IconKeyboard size={20} color="#22c55e" />
-                    </Box>
-                    <div>
-                        <Text fw={600} size="sm" style={{ color: '#fff' }}>Quick Tip</Text>
-                        <Text size="xs" c="dimmed">
-                            Hold <b style={{ color: '#22c55e' }}>{config.hotkey}</b> to record. Release to transcribe.
-                        </Text>
-                    </div>
-                </Group>
-            </Card>
+                        <Stack justify="space-between" h="100%">
+                            <Group justify="space-between">
+                                <ThemeIcon size="lg" radius="md" variant="light" color="blue" style={{ background: 'rgba(59, 130, 246, 0.1)' }}>
+                                    <IconFileText size={18} />
+                                </ThemeIcon>
+                                <Badge variant="outline" color="gray" size="sm">Total</Badge>
+                            </Group>
+                            <div>
+                                <Text size="3rem" fw={800} lh={1} c="white" style={{ letterSpacing: '-0.02em' }}>
+                                    {stats.wordsTranscribed}
+                                </Text>
+                                <Text size="sm" c="dimmed" mt={4} fw={500}>Words Transcribed</Text>
+                            </div>
+                        </Stack>
+                    </Card>
+                </Stack>
+
+                <Stack gap="lg" style={{ gridColumn: 'span 2' }}>
+                    <Title order={4} c="dimmed" size="sm" tt="uppercase" fw={700} style={{ letterSpacing: '0.05em' }}>Session Overview</Title>
+                    <SimpleGrid cols={2} spacing="lg">
+                        <Card
+                            radius="lg"
+                            p="xl"
+                            style={{
+                                background: 'linear-gradient(180deg, #151515 0%, #0a0a0a 100%)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                            }}
+                        >
+                            <Stack>
+                                <Group justify="space-between">
+                                    <ThemeIcon size="lg" radius="md" variant="light" color="orange" style={{ background: 'rgba(249, 115, 22, 0.1)' }}>
+                                        <IconClock size={18} />
+                                    </ThemeIcon>
+                                </Group>
+                                <div>
+                                    <Text size="2rem" fw={700} c="white">{formatDuration(stats.usageTimeSeconds)}</Text>
+                                    <Text size="sm" c="dimmed" fw={500}>Active Time</Text>
+                                </div>
+                            </Stack>
+                        </Card>
+                        <Card
+                            radius="lg"
+                            p="xl"
+                            style={{
+                                background: 'linear-gradient(180deg, #151515 0%, #0a0a0a 100%)',
+                                border: '1px solid rgba(255,255,255,0.08)',
+                            }}
+                        >
+                            <Stack>
+                                <Group justify="space-between">
+                                    <ThemeIcon size="lg" radius="md" variant="light" color="grape" style={{ background: 'rgba(147, 51, 234, 0.1)' }}>
+                                        <IconStack2 size={18} />
+                                    </ThemeIcon>
+                                </Group>
+                                <div>
+                                    <Text size="2rem" fw={700} c="white">{stats.sessionsCount}</Text>
+                                    <Text size="sm" c="dimmed" fw={500}>Total Sessions</Text>
+                                </div>
+                            </Stack>
+                        </Card>
+                    </SimpleGrid>
+                </Stack>
+            </SimpleGrid>
+
+            <Stack gap="lg">
+                <Title order={4} c="dimmed" size="sm" tt="uppercase" fw={700} style={{ letterSpacing: '0.05em' }}>System Capabilities</Title>
+                <SimpleGrid cols={3} spacing="lg">
+                    {[
+                        { icon: IconBolt, color: 'yellow', label: 'Ultra Low Latency', sub: '< 500ms response time' },
+                        { icon: IconShieldCheck, color: 'green', label: 'Local Encrypted', sub: 'Zero data retention' },
+                        { icon: IconWifi, color: 'cyan', label: 'Whisper Powered', sub: '99% accuracy model' }
+                    ].map((feature, i) => (
+                        <Card
+                            key={i}
+                            radius="lg"
+                            p="md"
+                            style={{
+                                background: 'rgba(255,255,255,0.02)',
+                                border: '1px solid rgba(255,255,255,0.05)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '16px'
+                            }}
+                        >
+                            <ThemeIcon
+                                size="lg"
+                                radius="md"
+                                variant="light"
+                                color={feature.color}
+                                style={{ background: `var(--mantine-color-${feature.color}-9)`, opacity: 0.8 }}
+                            >
+                                <feature.icon size={18} />
+                            </ThemeIcon>
+                            <div>
+                                <Text size="sm" fw={600} c="white">{feature.label}</Text>
+                                <Text size="xs" c="dimmed">{feature.sub}</Text>
+                            </div>
+                        </Card>
+                    ))}
+                </SimpleGrid>
+            </Stack>
         </Stack>
     );
 }

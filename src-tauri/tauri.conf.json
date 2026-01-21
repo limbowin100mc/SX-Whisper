@@ -1,0 +1,48 @@
+{
+  "productName": "SX Whisper",
+  "version": "0.1.0",
+  "identifier": "com.sxset.sx-whisper",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "SX Whisper",
+        "width": 1100,
+        "height": 750,
+        "resizable": true,
+        "minWidth": 400,
+        "minHeight": 400,
+        "center": true,
+        "visible": true,
+        "closable": true
+      }
+    ],
+    "trayIcon": {
+      "id": "main-tray",
+      "iconPath": "icons/icon.png",
+      "iconAsTemplate": false,
+      "menuOnLeftClick": false,
+      "title": "SX Whisper"
+    },
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

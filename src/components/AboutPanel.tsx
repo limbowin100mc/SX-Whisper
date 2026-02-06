@@ -83,18 +83,7 @@ export function AboutPanel({ config }: AboutPanelProps) {
             <Text size="sm" c="dimmed" mt={4}>
               Voice to Text • Powered by Groq
             </Text>
-            <Badge 
-              mt="md" 
-              size="lg" 
-              radius="xl"
-              style={{
-                background: 'rgba(34, 197, 94, 0.15)',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-                color: '#22c55e',
-              }}
-            >
-              Version 0.1.0
-            </Badge>
+
           </div>
         </Stack>
       </Paper>

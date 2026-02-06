@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Box, Title, Button, Stack, Text } from '@mantine/core';
+import { Box, Title, Button, Stack } from '@mantine/core';
 import { IconMicrophone, IconArrowRight } from '@tabler/icons-react';
 
 interface IntroScreenProps {
@@ -182,20 +182,7 @@ export function IntroScreen({ onGetStarted }: IntroScreenProps) {
           Get Started
         </Button>
 
-        {/* Version */}
-        <Text
-          size="xs"
-          c="dimmed"
-          style={{
-            marginTop: '3rem',
-            letterSpacing: '0.2em',
-            opacity: 0.5,
-            fontWeight: 500,
-            textTransform: 'uppercase',
-          }}
-        >
-          Version 0.1.0
-        </Text>
+
       </Stack>
 
       <style>{`

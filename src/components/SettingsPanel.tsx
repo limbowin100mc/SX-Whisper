@@ -20,6 +20,8 @@ import {
   Collapse,
   Divider,
 } from '@mantine/core';
+import { open } from '@tauri-apps/plugin-dialog';
+import { invoke } from '@tauri-apps/api/core';
 import {
   IconKey,
   IconKeyboard,
@@ -35,6 +37,8 @@ import {
   IconSearch,
   IconChevronDown,
   IconChevronUp,
+  IconCamera,
+  IconFolderOpen,
 } from '@tabler/icons-react';
 import { HotkeyInput } from './HotkeyInput';
 import { AppConfig, SUPPORTED_LANGUAGES, LANGUAGE_GROUPS, TEXT_FORMATS, WordReplacement } from '../types';
@@ -124,6 +128,30 @@ export function SettingsPanel({ config, onConfigChange, onHotkeyCapture }: Setti
   const selectLanguage = (code: string) => {
     updateConfig('language', code);
     setLanguageSearch('');
+  };
+
+  const handleBrowseDirectory = async () => {
+    try {
+      const selected = await open({
+        directory: true,
+        multiple: false,
+        title: 'Select Screenshot Save Location',
+      });
+      
+      if (selected && typeof selected === 'string') {
+        updateConfig('screenshotSaveDirectory', selected);
+      }
+    } catch (error) {
+      console.error('Failed to open directory picker:', error);
+    }
+  };
+
+  const handleOpenScreenshotsFolder = async () => {
+    try {
+      await invoke('open_screenshots_folder');
+    } catch (error) {
+      console.error('Failed to open screenshots folder:', error);
+    }
   };
 
   return (
@@ -732,6 +760,89 @@ export function SettingsPanel({ config, onConfigChange, onHotkeyCapture }: Setti
               </Group>
             </Paper>
           )}
+        </Stack>
+      </Paper>
+
+      {/* Screenshot Capture Section */}
+      <Paper 
+        p="xl" 
+        radius="lg" 
+        style={{
+          background: '#151515',
+          border: '1px solid #222',
+        }}
+      >
+        <Stack gap="lg">
+          <Group gap="sm">
+            <Box
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                background: 'linear-gradient(135deg, #111 0%, #151515 100%)',
+                border: '1px solid #222',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <IconCamera size={20} color="#22c55e" />
+            </Box>
+            <div>
+              <Text fw={600} size="lg" style={{ color: '#fff' }}>Screenshot Capture</Text>
+              <Text size="sm" c="dimmed">Configure screenshot settings</Text>
+            </div>
+          </Group>
+
+          <HotkeyInput
+            value={config.screenshotHotkey}
+            onChange={(hotkey) => updateConfig('screenshotHotkey', hotkey)}
+            label="Screenshot Hotkey"
+            description="Press this key combination to start screenshot capture"
+            onCaptureStart={() => onHotkeyCapture?.(true)}
+            onCaptureEnd={() => onHotkeyCapture?.(false)}
+          />
+
+          <Stack gap="xs">
+            <Text size="sm" fw={500} style={{ color: '#fff' }}>Save Location</Text>
+            <Text size="xs" c="dimmed">Choose where screenshots are saved</Text>
+            <Group align="flex-end" wrap="nowrap">
+              <TextInput
+                value={config.screenshotSaveDirectory || 'Default location'}
+                readOnly
+                placeholder="No directory selected"
+                style={{ flex: 1 }}
+                radius="lg"
+                styles={{
+                  input: {
+                    background: '#111',
+                    border: '1px solid #333',
+                    fontFamily: 'monospace',
+                    fontSize: '0.875rem',
+                  },
+                }}
+              />
+              <Button
+                onClick={handleBrowseDirectory}
+                radius="lg"
+                className="glass-button"
+              >
+                Browse
+              </Button>
+              <Tooltip label="Open screenshots folder">
+                <Button
+                  onClick={handleOpenScreenshotsFolder}
+                  variant="subtle"
+                  color="gray"
+                  radius="lg"
+                  className="glass-button"
+                  px="sm"
+                >
+                  <IconFolderOpen size={18} />
+                </Button>
+              </Tooltip>
+            </Group>
+          </Stack>
         </Stack>
       </Paper>
     </Stack>

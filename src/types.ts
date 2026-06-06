@@ -15,6 +15,8 @@ export interface AppConfig {
   textFormat: 'none' | 'capitalize' | 'lowercase' | 'uppercase' | 'title';
   wordReplacements: WordReplacement[];
   overlayColor: 'purple' | 'green' | 'red' | 'blue' | 'white' | 'cyan' | 'orange' | 'pink';
+  screenshotHotkey: string;
+  screenshotSaveDirectory: string;
 }
 
 export interface HistoryEntry {
@@ -29,6 +31,22 @@ export interface AppStats {
   sessionsCount: number;
 }
 
+export interface MonitorInfo {
+  id: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  scaleFactor: number;
+}
+
+export interface CaptureSelection {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export const DEFAULT_CONFIG: AppConfig = {
   hotkey: 'Control+Shift+Space',
   apiKey: '',
@@ -39,6 +57,8 @@ export const DEFAULT_CONFIG: AppConfig = {
   textFormat: 'none',
   wordReplacements: [],
   overlayColor: 'purple',
+  screenshotHotkey: 'Control+Shift+S',
+  screenshotSaveDirectory: '',
 };
 
 export const ACCENT_COLORS = [

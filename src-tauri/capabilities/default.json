@@ -2,10 +2,16 @@
   "identifier": "default",
   "description": "Default capabilities for SX Whisper",
   "windows": [
-    "main"
+    "main",
+    "capture-overlay",
+    "screenshot-preview"
   ],
   "permissions": [
     "core:default",
+    "core:window:allow-create",
+    "core:window:allow-close",
+    "core:window:allow-show",
+    "core:window:allow-hide",
     "opener:default",
     "global-shortcut:allow-register",
     "global-shortcut:allow-unregister",
@@ -15,12 +21,26 @@
     "store:allow-save",
     "store:allow-load",
     "dialog:default",
+    "dialog:allow-open",
     "fs:default",
     "fs:allow-write-text-file",
+    "fs:allow-write-file",
+    "fs:allow-mkdir",
+    "fs:allow-read-dir",
+    "fs:allow-read-file",
     {
       "identifier": "fs:scope",
       "allow": [
         "$HOME/**"
+      ]
+    },
+    {
+      "identifier": "fs:allow-read-file",
+      "allow": [
+        { "path": "$HOME/**" },
+        { "path": "$PICTURE/**" },
+        { "path": "$DESKTOP/**" },
+        { "path": "$TEMP/**" }
       ]
     }
   ]

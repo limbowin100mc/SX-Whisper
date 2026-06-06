@@ -1,0 +1,75 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  background: transparent;
+}
+
+/* Dimmed backdrop over the whole screen */
+#backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+/* The selection rectangle cuts out the dimming with box-shadow trick */
+#selection {
+  position: fixed;
+  display: none;
+  border: 1.5px solid #3ba0ff;
+  box-shadow:
+    0 0 0 99999px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.15) inset;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Crosshair guides that follow the cursor */
+.guide {
+  position: fixed;
+  background: rgba(255, 255, 255, 0.35);
+  pointer-events: none;
+  z-index: 5;
+  display: none;
+}
+
+#guide-h {
+  left: 0;
+  width: 100vw;
+  height: 1px;
+}
+
+#guide-v {
+  top: 0;
+  width: 1px;
+  height: 100vh;
+}
+
+/* Dimension badge */
+#info {
+  position: fixed;
+  background: rgba(20, 20, 20, 0.92);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font: 600 12px/1 'Segoe UI', system-ui, monospace;
+  display: none;
+  pointer-events: none;
+  z-index: 20;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}

@@ -1,11 +1,13 @@
 mod audio;
 mod config;
 mod paster;
+mod screenshot;
 mod transcription;
 
 use audio::AudioRecorder;
 use config::{AppConfig, HistoryEntry};
 use paster::TextPaster;
+use screenshot::ScreenshotManager;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
@@ -35,22 +37,36 @@ struct PersistentData {
     stats: AppStats,
 }
 
-struct AppState {
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PendingPreview {
+    pub path: String,
+    pub filename: String,
+}
+
+pub struct AppState {
     config: Mutex<AppConfig>,
     history: Mutex<Vec<HistoryEntry>>,
     stats: Mutex<AppStats>,
     recorder: Mutex<AudioRecorder>,
     recording_start: Mutex<Option<Instant>>,
+    pub screenshot_manager: Mutex<Option<ScreenshotManager>>,
+    pub pending_preview: Mutex<Option<PendingPreview>>,
 }
 
 impl AppState {
     fn new(recorder: AudioRecorder) -> Self {
+        let config = AppConfig::default();
+        let screenshot_manager = ScreenshotManager::new(PathBuf::from(&config.screenshot_save_directory));
+        
         Self {
-            config: Mutex::new(AppConfig::default()),
+            config: Mutex::new(config),
             history: Mutex::new(Vec::new()),
             stats: Mutex::new(AppStats::default()),
             recorder: Mutex::new(recorder),
             recording_start: Mutex::new(None),
+            screenshot_manager: Mutex::new(Some(screenshot_manager)),
+            pending_preview: Mutex::new(None),
         }
     }
 }
@@ -162,6 +178,72 @@ fn hide_overlay(app: &tauri::AppHandle) {
     }
 }
 
+fn show_capture_overlay(app: &tauri::AppHandle) -> Result<(), String> {
+    // Check if overlay already exists
+    if let Some(overlay) = app.get_webview_window("capture-overlay") {
+        let _ = overlay.show();
+        let _ = overlay.set_focus();
+        return Ok(());
+    }
+
+    // Get all monitors to calculate total screen dimensions
+    let monitors = screenshot::ScreenshotManager::get_monitors()?;
+    
+    if monitors.is_empty() {
+        return Err("No monitors detected".to_string());
+    }
+
+    // Calculate bounding box that spans all monitors
+    let mut min_x = i32::MAX;
+    let mut min_y = i32::MAX;
+    let mut max_x = i32::MIN;
+    let mut max_y = i32::MIN;
+
+    for monitor in &monitors {
+        min_x = min_x.min(monitor.x);
+        min_y = min_y.min(monitor.y);
+        max_x = max_x.max(monitor.x + monitor.width as i32);
+        max_y = max_y.max(monitor.y + monitor.height as i32);
+    }
+
+    let total_width = (max_x - min_x) as f64;
+    let total_height = (max_y - min_y) as f64;
+
+    // Determine URL based on build mode
+    let url = if cfg!(debug_assertions) {
+        WebviewUrl::External("http://localhost:1420/capture-overlay.html".parse().unwrap())
+    } else {
+        WebviewUrl::App("capture-overlay.html".into())
+    };
+
+    // Create full-screen transparent overlay window
+    let overlay = WebviewWindowBuilder::new(app, "capture-overlay", url)
+        .title("Screenshot Capture")
+        .inner_size(total_width, total_height)
+        .position(min_x as f64, min_y as f64)
+        .decorations(false)
+        .transparent(true)
+        .always_on_top(true)
+        .skip_taskbar(true)
+        .resizable(false)
+        .visible(true)
+        .focused(true)
+        .build()
+        .map_err(|e| format!("Failed to create capture overlay window: {}", e))?;
+
+    let _ = overlay.set_focus();
+    
+    Ok(())
+}
+
+#[tauri::command]
+fn close_capture_overlay(app: tauri::AppHandle) -> Result<(), String> {
+    if let Some(overlay) = app.get_webview_window("capture-overlay") {
+        overlay.close().map_err(|e| format!("Failed to close overlay: {}", e))?;
+    }
+    Ok(())
+}
+
 fn show_main_window(app: &tauri::AppHandle) {
     if let Some(window) = app.get_webview_window("main") {
         let _ = window.show();
@@ -184,7 +266,22 @@ fn get_config(state: tauri::State<AppState>) -> AppConfig {
 
 #[tauri::command]
 fn set_config(state: tauri::State<AppState>, config: AppConfig) {
+    // Check if screenshot save directory has changed
+    let old_directory = {
+        let old_config = state.config.lock().unwrap();
+        old_config.screenshot_save_directory.clone()
+    };
+    
+    let new_directory = config.screenshot_save_directory.clone();
+    
+    // Update config
     *state.config.lock().unwrap() = config;
+    
+    // Update screenshot manager if directory changed
+    if old_directory != new_directory {
+        let new_manager = ScreenshotManager::new(PathBuf::from(&new_directory));
+        *state.screenshot_manager.lock().unwrap() = Some(new_manager);
+    }
 }
 
 #[tauri::command]
@@ -336,54 +433,72 @@ fn get_recording_state(state: tauri::State<AppState>) -> bool {
 }
 
 #[tauri::command]
-async fn register_hotkey(app: tauri::AppHandle, hotkey: String) -> Result<(), String> {
+async fn register_hotkey(app: tauri::AppHandle, hotkey: String, screenshot_hotkey: String) -> Result<(), String> {
     let _ = app.global_shortcut().unregister_all();
 
-    if hotkey.is_empty() {
-        return Ok(());
-    }
+    // Register recording hotkey if provided
+    if !hotkey.is_empty() {
+        let shortcut: Shortcut = hotkey
+            .parse()
+            .map_err(|e| format!("Invalid hotkey format: {}", e))?;
 
-    let shortcut: Shortcut = hotkey
-        .parse()
-        .map_err(|e| format!("Invalid hotkey format: {}", e))?;
+        app.global_shortcut()
+            .on_shortcut(shortcut, move |app, _shortcut, event| {
+                let state = app.state::<AppState>();
+                let config = state.config.lock().unwrap();
 
-    app.global_shortcut()
-        .on_shortcut(shortcut, move |app, _shortcut, event| {
-            let state = app.state::<AppState>();
-            let config = state.config.lock().unwrap();
+                if !config.is_enabled {
+                    return;
+                }
+                drop(config);
 
-            if !config.is_enabled {
-                return;
-            }
-            drop(config);
-
-            match event.state() {
-                ShortcutState::Pressed => {
-                    show_overlay(app);
-                    let _ = app.emit("recording_state", true);
-                    if let Err(e) = start_recording_internal(app) {
-                        let _ = app.emit("error", e);
+                match event.state() {
+                    ShortcutState::Pressed => {
+                        show_overlay(app);
+                        let _ = app.emit("recording_state", true);
+                        if let Err(e) = start_recording_internal(app) {
+                            let _ = app.emit("error", e);
+                            hide_overlay(app);
+                        }
+                    }
+                    ShortcutState::Released => {
                         hide_overlay(app);
+                        let _ = app.emit("recording_state", false);
+                        let app_clone = app.clone();
+                        tauri::async_runtime::spawn(async move {
+                            match stop_and_transcribe_internal(&app_clone).await {
+                                Ok(text) => {
+                                    let _ = app_clone.emit("transcription_complete", text);
+                                }
+                                Err(e) => {
+                                    let _ = app_clone.emit("error", e);
+                                }
+                            }
+                        });
                     }
                 }
-                ShortcutState::Released => {
-                    hide_overlay(app);
-                    let _ = app.emit("recording_state", false);
-                    let app_clone = app.clone();
-                    tauri::async_runtime::spawn(async move {
-                        match stop_and_transcribe_internal(&app_clone).await {
-                            Ok(text) => {
-                                let _ = app_clone.emit("transcription_complete", text);
-                            }
-                            Err(e) => {
-                                let _ = app_clone.emit("error", e);
-                            }
-                        }
-                    });
+            })
+            .map_err(|e| format!("Failed to register hotkey: {}", e))?;
+    }
+
+    // Register screenshot hotkey if provided
+    if !screenshot_hotkey.is_empty() {
+        let screenshot_shortcut: Shortcut = screenshot_hotkey
+            .parse()
+            .map_err(|e| format!("Invalid screenshot hotkey format: {}", e))?;
+
+        app.global_shortcut()
+            .on_shortcut(screenshot_shortcut, move |app, _shortcut, event| {
+                // Screenshot hotkey only triggers on press (not hold-and-release like recording)
+                if event.state() == ShortcutState::Pressed {
+                    if let Err(e) = show_capture_overlay(app) {
+                        eprintln!("Failed to show capture overlay: {}", e);
+                        let _ = app.emit("error", format!("Failed to start screenshot capture: {}", e));
+                    }
                 }
-            }
-        })
-        .map_err(|e| format!("Failed to register hotkey: {}", e))?;
+            })
+            .map_err(|e| format!("Failed to register screenshot hotkey: {}", e))?;
+    }
 
     Ok(())
 }
@@ -454,6 +569,18 @@ pub fn run() {
             stop_recording_and_transcribe,
             get_recording_state,
             register_hotkey,
+            close_capture_overlay,
+            screenshot::capture_screenshot,
+            screenshot::get_monitors,
+            screenshot::capture_screen_for_overlay,
+            screenshot::open_screenshots_folder,
+            screenshot::register_screenshot_hotkey,
+            screenshot::copy_image_to_clipboard,
+            screenshot::start_file_drag,
+            screenshot::reveal_in_folder,
+            screenshot::screenshot_preview_ready,
+            screenshot::get_pending_preview,
+            screenshot::clear_pending_preview,
         ])
         .on_window_event(|window, event| {
             // Handle window close - hide to tray instead of quitting

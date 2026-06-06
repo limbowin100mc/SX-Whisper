@@ -11,4 +11,13 @@ export default defineConfig({
       ignored: ["**/src-tauri/**"],
     },
   },
+  build: {
+    rollupOptions: {
+      input: {
+        main: "index.html",
+        "capture-overlay": "capture-overlay.html",
+        "screenshot-preview": "screenshot-preview.html",
+      },
+    },
+  },
 });

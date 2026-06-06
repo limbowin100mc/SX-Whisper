@@ -48,9 +48,9 @@ export function useConfig() {
     }
   }, []);
 
-  const registerHotkey = useCallback(async (hotkey: string) => {
+  const registerHotkey = useCallback(async (hotkey: string, screenshotHotkey: string) => {
     try {
-      await invoke('register_hotkey', { hotkey });
+      await invoke('register_hotkey', { hotkey, screenshotHotkey });
       setError(null);
     } catch (e) {
       console.error('Failed to register hotkey:', e);

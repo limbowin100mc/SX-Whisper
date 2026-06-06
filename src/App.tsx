@@ -13,6 +13,8 @@ import {
   ActionIcon,
   Tooltip,
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { listen } from '@tauri-apps/api/event';
 import {
   IconSettings,
   IconHistory,
@@ -25,6 +27,7 @@ import {
   IconMenu2,
   IconKeyboard,
   IconMicrophone,
+  IconCamera,
 } from '@tabler/icons-react';
 import { HomePanel } from './components/HomePanel';
 import { SettingsPanel } from './components/SettingsPanel';
@@ -139,9 +142,34 @@ function App() {
 
   useEffect(() => {
     if (config.hotkey && config.isEnabled && !isCapturingHotkeyRef.current) {
-      registerHotkey(config.hotkey);
+      registerHotkey(config.hotkey, config.screenshotHotkey);
     }
-  }, [config.hotkey, config.isEnabled, registerHotkey]);
+  }, [config.hotkey, config.screenshotHotkey, config.isEnabled, registerHotkey]);
+
+  // Listen for screenshot_complete events emitted from Rust after a successful capture
+  useEffect(() => {
+    const unlistenPromise = listen<{
+      path: string;
+      filename: string;
+      width: number;
+      height: number;
+    }>('screenshot_complete', (event) => {
+      const { filename, width, height } = event.payload;
+      notifications.show({
+        id: `screenshot-${Date.now()}`,
+        title: 'Screenshot saved',
+        message: `${filename} · ${width}×${height}px`,
+        color: 'green',
+        icon: <IconCamera size={18} />,
+        autoClose: 3500,
+        withBorder: true,
+      });
+    });
+
+    return () => {
+      unlistenPromise.then((unlisten) => unlisten()).catch(() => {});
+    };
+  }, []);
 
   const handleHotkeyCapture = (capturing: boolean) => {
     isCapturingHotkeyRef.current = capturing;

@@ -1,0 +1,208 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Floating card container */
+#card {
+  position: fixed;
+  inset: 0;
+  margin: 10px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(24, 24, 27, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow:
+    0 20px 48px rgba(0, 0, 0, 0.55),
+    0 4px 12px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  overflow: hidden;
+  animation: sp-slideIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+#card.fading {
+  animation: sp-slideOut 0.25s ease forwards;
+}
+
+#card:hover {
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.6),
+    0 6px 14px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes sp-slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes sp-slideOut {
+  to {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+}
+
+/* Drag handle — entire top-bar area lets user move the window */
+#drag-handle {
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  cursor: grab;
+}
+
+#drag-handle:active {
+  cursor: grabbing;
+}
+
+#drag-handle .label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+#close-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+#close-btn:hover {
+  background: #e5484d;
+  color: #fff;
+}
+
+/* Preview image */
+#preview-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+#preview {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  -webkit-user-drag: element;
+  cursor: grab;
+}
+
+#preview:active {
+  cursor: grabbing;
+}
+
+/* Toolbar */
+#toolbar {
+  display: flex;
+  gap: 6px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.tool-btn {
+  flex: 1;
+  height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.tool-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.tool-btn:active {
+  transform: scale(0.97);
+}
+
+.tool-btn.primary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.tool-btn.primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.tool-btn.copied {
+  background: #16a34a !important;
+  border-color: #16a34a !important;
+  color: #fff !important;
+}
+
+/* Auto-dismiss progress bar at the bottom */
+#progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: rgba(37, 99, 235, 0.85);
+  transform-origin: left center;
+  transform: scaleX(1);
+  transition: transform 4s linear;
+  pointer-events: none;
+}
+
+#progress.running {
+  transform: scaleX(0);
+}
+
+#progress.paused {
+  transition: transform 0.1s ease;
+}

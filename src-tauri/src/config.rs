@@ -10,6 +10,7 @@ pub struct WordReplacement {
 }
 
 impl WordReplacement {
+    #[allow(dead_code)]
     pub fn new(trigger: String, replacement: String) -> Self {
         Self {
             id: uuid::Uuid::new_v4().to_string(),
@@ -36,6 +37,9 @@ pub struct AppConfig {
     pub word_replacements: Vec<WordReplacement>,
     // Overlay color
     pub overlay_color: String, // "purple", "green", "red", "blue", "white", "cyan", "orange", "pink"
+    // Screenshot settings
+    pub screenshot_hotkey: String,
+    pub screenshot_save_directory: String,
 }
 
 impl Default for AppConfig {
@@ -50,8 +54,17 @@ impl Default for AppConfig {
             text_format: "none".to_string(),
             word_replacements: Vec::new(),
             overlay_color: "purple".to_string(),
+            screenshot_hotkey: "Control+Shift+S".to_string(),
+            screenshot_save_directory: default_screenshot_directory(),
         }
     }
+}
+
+fn default_screenshot_directory() -> String {
+    dirs::picture_dir()
+        .map(|path| path.join("SX Whisper Screenshots"))
+        .and_then(|path| path.to_str().map(|s| s.to_string()))
+        .unwrap_or_else(|| "SX Whisper Screenshots".to_string())
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

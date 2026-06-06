@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Screenshot Preview</title>
+</head>
+
+<body>
+  <div id="card">
+    <div id="drag-handle" data-tauri-drag-region>
+      <span class="label">Screenshot</span>
+      <button id="close-btn" title="Dismiss">×</button>
+    </div>
+    <div id="preview-wrap">
+      <img id="preview" alt="Screenshot preview" draggable="true" />
+    </div>
+    <div id="toolbar">
+      <button id="copy-btn" class="tool-btn primary">Copy</button>
+      <button id="save-btn" class="tool-btn">Show in Folder</button>
+    </div>
+    <div id="progress"></div>
+  </div>
+  <script type="module" src="/src/screenshot-preview.ts"></script>
+</body>
+
+</html>

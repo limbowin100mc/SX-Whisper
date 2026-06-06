@@ -31,7 +31,19 @@
       "title": "SX Whisper"
     },
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$HOME/**",
+          "$PICTURE/**",
+          "$DOCUMENT/**",
+          "$DESKTOP/**",
+          "$APPDATA/**",
+          "$LOCALDATA/**",
+          "$TEMP/**"
+        ]
+      }
     }
   },
   "bundle": {
